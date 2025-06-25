@@ -10,6 +10,7 @@ This script contains 4 functions:
 
 '''
 from __future__ import division
+from __future__ import annotations
 import sys  
 sys.path.append('/home/maggie/.local/lib/python2.7/site-packages/open3d')  
 import numpy as np
@@ -267,7 +268,7 @@ def generate_new_trajectory(pcd, groove, normal):
     vec = end_point - middle_point
     proj = np.dot(vec, normal)*normal
     vec = vec - proj
-    print np.dot(vec, normal)
+    print (np.dot(vec, normal))
     displacemnt = []
 
     for i in np.linspace(-1, 1, x.size):
@@ -478,7 +479,7 @@ def cluster_groove_from_point_cloud(pcd_selected, voxel_size, verbose=False):
             label_number = label[np.argsort(label_counts)[-2]]
         elif label.shape[0]==1:
             # sys.exit("can not find a valid groove cluster")
-            print "can not find a valid groove cluster"
+            print ("can not find a valid groove cluster")
     
     groove_index = np.where(labels == label_number)
     groove = pcd_selected.select_down_sample(groove_index[0])
@@ -711,7 +712,7 @@ def find_orientation(trajectory, pcd, groove, normal):
     return ur_poses
 
 def trajectory_execution(pose_list):
-    print "\nPress `Enter` to execute or q to quit: "
+    print ("\nPress `Enter` to execute or q to quit: ")
     if not raw_input() == 'q':
         # tcp_torch = [-0.00072, 0.05553, 0.2312, -0.8504775921315857, -0.02340453557068149, -0.015929517346989313]
         tcp_torch = [-0.00072, 0.05553, 0.23120, -0.8504775921315857, -0.02340453557068149, -0.015929517346989313]
