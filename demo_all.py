@@ -22,6 +22,7 @@ from sensor_msgs.msg import PointCloud2, PointField
 from geometry_msgs.msg import PoseStamped, Pose, PoseArray
 from visualization_msgs.msg import Marker, MarkerArray
 import sensor_msgs.point_cloud2 as pc2
+from nav_msgs.msg import Odometry
 import os
 from datetime import datetime
 import time
@@ -36,6 +37,7 @@ from scipy.spatial.transform import Rotation as R
 from scipy import interpolate
 import copy
 import math
+
 
 
 # The data structure of each point in ros PointCloud2: 16 bits = x + y + z + rgb
@@ -411,6 +413,10 @@ def callback_roscloud(ros_cloud):
 
         received_ros_cloud=ros_cloud
         # rospy.loginfo("-- Received ROS PointCloud2 message.")
+
+def callback_odom(odom):
+    global received_odom
+    received_odom = odom
 
 def transform_cam_wrt_base(pcd, T_end_effector_wrt_base):
     
@@ -793,12 +799,16 @@ if __name__ == "__main__":
        
     rospy.init_node('welding_demo', anonymous=True)
 
-    robot = urx.Robot("192.168.0.2")
+    #robot = urx.Robot("192.168.0.2")
 
     # -- Set subscriber
-    global received_ros_cloud, max_dis, total_time
+    global received_ros_cloud, received_odom, max_dis, total_time
     received_ros_cloud = None
+    received_odom = None
     rospy.Subscriber('/camera/depth/color/points', PointCloud2, callback_roscloud, queue_size=1)  
+    rospy.Subscriber('/odom', Odometry, callback_odom, queue_size=1)
+    
+
 
     # -- Set publisher
     pub_groove = rospy.Publisher("groove_points", PointCloud2, queue_size=1)
@@ -856,21 +866,21 @@ if __name__ == "__main__":
 
     while not rospy.is_shutdown():
         
-        robot.movej(startj, acc=0.8, vel=0.4, wait=True)
+        #robot.movej(startj, acc=0.8, vel=0.4, wait=True)
         time.sleep(1)
 
         if execution == True:
-            capture = raw_input("\n\nstart capture point cloud, q to quit: ")
+            capture = input("\n\nstart capture point cloud, q to quit: ")
             # capture = ''
             if capture == 'q':
-                robot.close()
+                #robot.close()
                 break
             else:
                 # convert it back to open3d, and draw
                 print("starting, please don't move the workpiece")
                 time.sleep(2)
                 capture_number += 1
-                robot.set_tcp((0, 0, 0, 0, 0, 0))
+                #robot.set_tcp((0, 0, 0, 0, 0, 0))
                 time.sleep(1)
                 if not received_ros_cloud is None:
 
